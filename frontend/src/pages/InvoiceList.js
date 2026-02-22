@@ -76,9 +76,9 @@ const InvoiceList = () => {
     };
     return (
       <span
-        className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status]}`}
+        className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status] || 'bg-gray-100 text-gray-800'}`}
       >
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {status ? status.charAt(0).toUpperCase() + status.slice(1) : 'N/A'}
       </span>
     );
   };
