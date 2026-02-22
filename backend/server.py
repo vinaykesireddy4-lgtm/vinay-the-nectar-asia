@@ -27,6 +27,9 @@ from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 # Import WhatsApp routes
 from whatsapp_routes import whatsapp_router
 
+# Import Recovery routes
+from recovery_routes import recovery_router
+
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
