@@ -157,7 +157,7 @@ function App() {
             <Route path="invoice-manager" element={<InvoiceManagement />} />
             <Route path="recovery" element={<RecoveryManagement />} />
             <Route path="settings/whatsapp" element={<WhatsAppConnection />} />
-            <Route path="inventory-overview" element={<InventoryDashboard />} />
+            <Route path="inventory-dashboard" element={<InventoryDashboard />} />
             <Route path="stock-inward" element={<StockInward />} />
             <Route path="products" element={<Products />} />
             <Route path="raw-materials" element={<RawMaterials />} />
