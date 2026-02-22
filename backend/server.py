@@ -6220,6 +6220,7 @@ async def reset_user_password(user_id: str, password_data: dict):
 
 app.include_router(api_router)
 app.include_router(whatsapp_router)
+app.include_router(recovery_router)
 
 app.add_middleware(
     CORSMiddleware,
