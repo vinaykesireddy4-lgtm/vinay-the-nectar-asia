@@ -10,7 +10,7 @@ import httpx
 import os
 
 # Create recovery router
-recovery_router = APIRouter()
+recovery_router = APIRouter(prefix="/api")
 
 # Database connection will be accessed from server.py
 # We'll use a lazy initialization approach
