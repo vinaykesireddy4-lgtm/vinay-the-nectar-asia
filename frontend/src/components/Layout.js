@@ -24,7 +24,6 @@ const Layout = ({ user, onLogout }) => {
       title: 'Inventory',
       items: [
         { name: 'Inventory Dashboard', path: '/inventory-dashboard', icon: LayoutGrid },
-        { name: 'Inventory Overview', path: '/inventory-overview', icon: LayoutGrid },
         { name: 'Pending Approvals', path: '/pending-approvals', icon: ClipboardCheck },
         { name: 'Request Purchase', path: '/request-purchase', icon: ShoppingCart },
         { name: 'Stock Inward', path: '/stock-inward', icon: PackagePlus },
