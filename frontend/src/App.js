@@ -23,6 +23,7 @@ import InvoiceList from '@/pages/InvoiceList';
 import InvoiceView from '@/pages/InvoiceView';
 import Quotations from '@/pages/Quotations';
 import CreateQuotation from '@/pages/CreateQuotation';
+import QuotationView from '@/pages/QuotationView';
 import SalesOrders from '@/pages/SalesOrders';
 import CreateSalesOrder from '@/pages/CreateSalesOrder';
 import DeliveryChallans from '@/pages/DeliveryChallans';
@@ -173,6 +174,7 @@ function App() {
             <Route path="customers" element={<Customers />} />
             <Route path="suppliers" element={<Suppliers />} />
             <Route path="quotations" element={<Quotations />} />
+            <Route path="quotations/:id" element={<QuotationView />} />
             <Route path="create-quotation" element={<CreateQuotation />} />
             <Route path="sales-orders" element={<SalesOrders />} />
             <Route path="create-sales-order" element={<CreateSalesOrder />} />
