@@ -6,17 +6,18 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 from datetime import datetime, timezone, timedelta
 from uuid import uuid4
-from motor.motor_asyncio import AsyncIOMotorClient
 import httpx
 import os
 
 # Create recovery router
 recovery_router = APIRouter()
 
-# MongoDB connection (will be shared from server.py)
-mongo_url = os.environ.get('MONGO_URL', '')
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ.get('DB_NAME', 'nectar_db')]
+# Database connection will be accessed from server.py
+# We'll use a lazy initialization approach
+def get_db():
+    """Get database connection from server module"""
+    from server import db
+    return db
 
 
 # ========== MODELS FOR RECOVERY ==========
