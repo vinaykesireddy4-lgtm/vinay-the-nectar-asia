@@ -133,7 +133,7 @@ const Layout = ({ user, onLogout }) => {
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3 mb-4">
             <img 
-              src="/nectar-logo-new.png?v=2" 
+              src="/nectar-logo.svg" 
               alt="Nectar Logo" 
               className="h-12 w-12 object-contain"
             />
