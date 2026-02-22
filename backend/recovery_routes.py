@@ -1,11 +1,26 @@
 # Recovery Module Backend APIs
 # Payment Recovery and Follow-up Management
 
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 from datetime import datetime, timezone, timedelta
 from uuid import uuid4
+from motor.motor_asyncio import AsyncIOMotorClient
+import httpx
+import os
 
-# Models for Recovery
+# Create recovery router
+recovery_router = APIRouter()
+
+# MongoDB connection (will be shared from server.py)
+mongo_url = os.environ.get('MONGO_URL', '')
+client = AsyncIOMotorClient(mongo_url)
+db = client[os.environ.get('DB_NAME', 'nectar_db')]
+
+
+# ========== MODELS FOR RECOVERY ==========
+
 class PaymentRecord(BaseModel):
     model_config = ConfigDict(extra="ignore")
     
@@ -19,6 +34,7 @@ class PaymentRecord(BaseModel):
     notes: Optional[str] = ""
     recorded_by: str
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 
 class FollowUpNote(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -35,8 +51,10 @@ class FollowUpNote(BaseModel):
     recorded_by: str
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
-# Recovery Dashboard Stats
-@api_router.get("/recovery/stats")
+
+# ========== RECOVERY ROUTES ==========
+
+@recovery_router.get("/recovery/stats")
 async def get_recovery_stats():
     """Get recovery dashboard statistics"""
     try:
@@ -116,8 +134,8 @@ async def get_recovery_stats():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Get Overdue Invoices
-@api_router.get("/recovery/overdue-invoices")
+
+@recovery_router.get("/recovery/overdue-invoices")
 async def get_overdue_invoices(
     days_overdue: Optional[int] = None,
     customer_name: Optional[str] = None,
@@ -179,8 +197,8 @@ async def get_overdue_invoices(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Record Payment
-@api_router.post("/recovery/record-payment")
+
+@recovery_router.post("/recovery/record-payment")
 async def record_payment(payment: PaymentRecord):
     """Record a payment against an invoice"""
     try:
@@ -190,7 +208,7 @@ async def record_payment(payment: PaymentRecord):
             raise HTTPException(status_code=404, detail="Invoice not found")
         
         # Save payment record
-        await db.payment_records.insert_one(payment.dict())
+        await db.payment_records.insert_one(payment.model_dump())
         
         # Update invoice
         paid_amount = invoice.get('paid_amount', 0) + payment.amount
@@ -223,18 +241,18 @@ async def record_payment(payment: PaymentRecord):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Add Follow-up Note
-@api_router.post("/recovery/follow-up")
+
+@recovery_router.post("/recovery/follow-up")
 async def add_follow_up(follow_up: FollowUpNote):
     """Add a follow-up note for an invoice"""
     try:
-        await db.follow_ups.insert_one(follow_up.dict())
+        await db.follow_ups.insert_one(follow_up.model_dump())
         return {"success": True, "message": "Follow-up note added successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Get Follow-up History
-@api_router.get("/recovery/follow-ups/{invoice_id}")
+
+@recovery_router.get("/recovery/follow-ups/{invoice_id}")
 async def get_follow_ups(invoice_id: str):
     """Get all follow-ups for an invoice"""
     try:
@@ -246,8 +264,8 @@ async def get_follow_ups(invoice_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Get Payment History
-@api_router.get("/recovery/payments/{invoice_id}")
+
+@recovery_router.get("/recovery/payments/{invoice_id}")
 async def get_payment_history(invoice_id: str):
     """Get payment history for an invoice"""
     try:
@@ -259,8 +277,8 @@ async def get_payment_history(invoice_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Send Payment Reminder via WhatsApp
-@api_router.post("/recovery/send-reminder/{invoice_id}")
+
+@recovery_router.post("/recovery/send-reminder/{invoice_id}")
 async def send_payment_reminder(invoice_id: str):
     """Send payment reminder via WhatsApp"""
     try:
@@ -314,7 +332,7 @@ Thank you!"""
                     status="contacted",
                     recorded_by="System"
                 )
-                await db.follow_ups.insert_one(follow_up.dict())
+                await db.follow_ups.insert_one(follow_up.model_dump())
                 
                 return {"success": True, "message": "Payment reminder sent via WhatsApp"}
             else:
@@ -323,8 +341,8 @@ Thank you!"""
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Get Customer Outstanding Summary
-@api_router.get("/recovery/customer-summary")
+
+@recovery_router.get("/recovery/customer-summary")
 async def get_customer_summary():
     """Get outstanding summary by customer"""
     try:
