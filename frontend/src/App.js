@@ -209,7 +209,6 @@ function App() {
             <Route path="company-settings" element={<CompanySettings />} />
             
             {/* Dashboard Routes */}
-            <Route path="inventory-dashboard" element={<InventoryDashboard />} />
             <Route path="manufacturing-dashboard" element={<ManufacturingDashboard />} />
             <Route path="sales-dashboard" element={<SalesDashboard />} />
             <Route path="purchase-dashboard" element={<PurchaseDashboard />} />
