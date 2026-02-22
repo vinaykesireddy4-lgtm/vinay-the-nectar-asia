@@ -292,7 +292,7 @@ const Login = ({ onLogin }) => {
             <div className="lg:hidden text-center mb-8 animate-fade-in">
               <div className="inline-block p-6 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl mb-6">
                 <img 
-                  src="/nectar-logo-new.png?v=2" 
+                  src="/nectar-logo.svg" 
                   alt="Nectar" 
                   className="w-32 h-32 object-contain"
                 />

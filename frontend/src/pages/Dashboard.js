@@ -104,7 +104,7 @@ const Dashboard = () => {
             </div>
             <div className="hidden md:flex items-center gap-4">
               <img 
-                src="/nectar-logo-new.png?v=2" 
+                src="/nectar-logo.svg" 
                 alt="Nectar" 
                 className="h-16 w-16 object-contain"
               />
