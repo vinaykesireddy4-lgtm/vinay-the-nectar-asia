@@ -1,0 +1,16 @@
+<svg width="1080" height="1080" xmlns="http://www.w3.org/2000/svg">
+  <!-- White background -->
+  <rect width="1080" height="1080" fill="white"/>
+  
+  <!-- Top blue swoosh -->
+  <ellipse cx="540" cy="380" rx="450" ry="160" fill="#1e3a8a" transform="rotate(-12 540 380)"/>
+  
+  <!-- Bottom blue swoosh -->
+  <ellipse cx="540" cy="700" rx="450" ry="160" fill="#1e3a8a" transform="rotate(12 540 700)"/>
+  
+  <!-- Nectar text -->
+  <text x="540" y="580" font-family="Arial, sans-serif" font-size="200" font-weight="bold" fill="black" text-anchor="middle" dominant-baseline="middle">nectar</text>
+  
+  <!-- Tagline (optional) -->
+  <text x="540" y="880" font-family="Arial, sans-serif" font-size="48" fill="#666" text-anchor="middle">takes care forever</text>
+</svg>
