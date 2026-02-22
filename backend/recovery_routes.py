@@ -60,7 +60,7 @@ async def get_recovery_stats():
     """Get recovery dashboard statistics"""
     try:
         # Get all invoices
-        all_invoices = await db.invoices.find({"status": {"$ne": "cancelled"}}, {"_id": 0}).to_list(1000)
+        all_invoices = await get_db().invoices.find({"status": {"$ne": "cancelled"}}, {"_id": 0}).to_list(1000)
         
         today = datetime.now(timezone.utc)
         
@@ -152,7 +152,7 @@ async def get_overdue_invoices(
         if customer_name:
             query["customer_name"] = {"$regex": customer_name, "$options": "i"}
         
-        invoices = await db.invoices.find(query, {"_id": 0}).to_list(1000)
+        invoices = await get_db().invoices.find(query, {"_id": 0}).to_list(1000)
         
         today = datetime.now(timezone.utc)
         overdue_invoices = []
@@ -174,7 +174,7 @@ async def get_overdue_invoices(
                 invoice['outstanding_amount'] = outstanding
                 
                 # Get last follow-up
-                last_followup = await db.follow_ups.find_one(
+                last_followup = await get_db().follow_ups.find_one(
                     {"invoice_id": invoice['id']},
                     {"_id": 0},
                     sort=[("created_at", -1)]
@@ -182,7 +182,7 @@ async def get_overdue_invoices(
                 invoice['last_follow_up'] = last_followup
                 
                 # Get payment history
-                payments = await db.payment_records.find(
+                payments = await get_db().payment_records.find(
                     {"invoice_id": invoice['id']},
                     {"_id": 0}
                 ).to_list(100)
@@ -204,12 +204,12 @@ async def record_payment(payment: PaymentRecord):
     """Record a payment against an invoice"""
     try:
         # Get invoice
-        invoice = await db.invoices.find_one({"id": payment.invoice_id}, {"_id": 0})
+        invoice = await get_db().invoices.find_one({"id": payment.invoice_id}, {"_id": 0})
         if not invoice:
             raise HTTPException(status_code=404, detail="Invoice not found")
         
         # Save payment record
-        await db.payment_records.insert_one(payment.model_dump())
+        await get_db().payment_records.insert_one(payment.model_dump())
         
         # Update invoice
         paid_amount = invoice.get('paid_amount', 0) + payment.amount
@@ -221,7 +221,7 @@ async def record_payment(payment: PaymentRecord):
         else:
             payment_status = 'unpaid'
         
-        await db.invoices.update_one(
+        await get_db().invoices.update_one(
             {"id": payment.invoice_id},
             {"$set": {
                 "paid_amount": paid_amount,
@@ -247,7 +247,7 @@ async def record_payment(payment: PaymentRecord):
 async def add_follow_up(follow_up: FollowUpNote):
     """Add a follow-up note for an invoice"""
     try:
-        await db.follow_ups.insert_one(follow_up.model_dump())
+        await get_db().follow_ups.insert_one(follow_up.model_dump())
         return {"success": True, "message": "Follow-up note added successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -257,7 +257,7 @@ async def add_follow_up(follow_up: FollowUpNote):
 async def get_follow_ups(invoice_id: str):
     """Get all follow-ups for an invoice"""
     try:
-        follow_ups = await db.follow_ups.find(
+        follow_ups = await get_db().follow_ups.find(
             {"invoice_id": invoice_id},
             {"_id": 0}
         ).sort("created_at", -1).to_list(100)
@@ -270,7 +270,7 @@ async def get_follow_ups(invoice_id: str):
 async def get_payment_history(invoice_id: str):
     """Get payment history for an invoice"""
     try:
-        payments = await db.payment_records.find(
+        payments = await get_db().payment_records.find(
             {"invoice_id": invoice_id},
             {"_id": 0}
         ).sort("payment_date", -1).to_list(100)
@@ -283,7 +283,7 @@ async def get_payment_history(invoice_id: str):
 async def send_payment_reminder(invoice_id: str):
     """Send payment reminder via WhatsApp"""
     try:
-        invoice = await db.invoices.find_one({"id": invoice_id}, {"_id": 0})
+        invoice = await get_db().invoices.find_one({"id": invoice_id}, {"_id": 0})
         if not invoice:
             raise HTTPException(status_code=404, detail="Invoice not found")
         
@@ -333,7 +333,7 @@ Thank you!"""
                     status="contacted",
                     recorded_by="System"
                 )
-                await db.follow_ups.insert_one(follow_up.model_dump())
+                await get_db().follow_ups.insert_one(follow_up.model_dump())
                 
                 return {"success": True, "message": "Payment reminder sent via WhatsApp"}
             else:
@@ -347,7 +347,7 @@ Thank you!"""
 async def get_customer_summary():
     """Get outstanding summary by customer"""
     try:
-        invoices = await db.invoices.find(
+        invoices = await get_db().invoices.find(
             {
                 "status": {"$ne": "cancelled"},
                 "payment_status": {"$in": ["unpaid", "partially_paid"]}
